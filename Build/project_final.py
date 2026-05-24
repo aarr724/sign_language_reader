@@ -63,82 +63,181 @@ class Application:
 
         print("Loaded model from disk")
 
-        # ── GUI ───────────────────────────────────────────────────────────────
+        # ── MODERN GUI ───────────────────────────────────────────────────────
         self.root = tk.Tk()
-        self.root.title("Sign Language Reader")
+        self.root.title("ASL Sign Reader")
+        self.root.geometry("1250x720")
+        self.root.configure(bg="#0f1117")
+        self.root.resizable(False, False)
+
         self.root.protocol('WM_DELETE_WINDOW', self.destructor)
-        self.root.geometry("1100x750")
 
-        # webcam feed (left)
-        self.panel = tk.Label(self.root)
-        self.panel.place(x=20, y=50, width=420, height=520)
+        # ── Camera feed ──────────────────────────────────────────────────────
+        self.panel = tk.Label(self.root, bg="#1a1d27", bd=0)
+        self.panel.place(x=20, y=20, width=520, height=390)
 
-        # skeleton hand (right)
-        self.panel2 = tk.Label(self.root)
-        self.panel2.place(x=480, y=115, width=350, height=350)
+        # ── Skeleton feed ────────────────────────────────────────────────────
+        self.panel2 = tk.Label(self.root, bg="#1a1d27", bd=0)
+        self.panel2.place(x=570, y=20, width=350, height=350)
 
-        # title
-        tk.Label(self.root,
-                 text="Sign Language Reader",
-                 font=("Courier", 22, "bold")).place(x=20, y=10)
+        # ── Title ────────────────────────────────────────────────────────────
+        tk.Label(
+            self.root,
+            text="ASL Sign Language Reader",
+            bg="#0f1117",
+            fg="#00e5ff",
+            font=("Courier", 24, "bold")
+        ).place(x=20, y=430)
 
-        # current character
-        tk.Label(self.root, text="Character :",
-                 font=("Courier", 20, "bold")).place(x=20, y=580)
-        self.panel3 = tk.Label(self.root, font=("Courier", 20))
-        self.panel3.place(x=180, y=580)
+        # ── Character display ────────────────────────────────────────────────
+        tk.Label(
+            self.root,
+            text="Current Character",
+            bg="#0f1117",
+            fg="#666677",
+            font=("Courier", 11, "bold")
+        ).place(x=20, y=480)
 
-        tk.Label(self.root, text="Select:",
-                 font=("Courier", 20, "bold")).place(x=900, y=10)
-        self.panel4 = tk.Label(self.root, font=("Courier", 20))
-        self.panel4.place(x=900, y=10)
+        self.panel3 = tk.Label(
+            self.root,
+            text="",
+            bg="#0f1117",
+            fg="#00ff88",
+            font=("Courier", 48, "bold")
+        )
+        self.panel3.place(x=20, y=500)
 
-        self.image_panel1 = tk.Label(self.root, bg="white", relief="flat")
-        self.image_panel1.place(x=900, y=50, width=270, height=270)
-        img1 = Image.open("select.png").resize((270, 270), Image.LANCZOS)
+        # ── Sentence box ─────────────────────────────────────────────────────
+        tk.Label(
+            self.root,
+            text="Sentence",
+            bg="#0f1117",
+            fg="#666677",
+            font=("Courier", 11, "bold")
+        ).place(x=250, y=480)
+
+        self.panel5 = tk.Label(
+            self.root,
+            text="",
+            bg="#1a1d27",
+            fg="white",
+            font=("Courier", 16),
+            wraplength=700,
+            justify="left",
+            anchor="nw",
+            padx=15,
+            pady=10
+        )
+
+        self.panel5.place(x=250, y=510, width=700, height=90)
+
+        # ── Suggestions title ────────────────────────────────────────────────
+        tk.Label(
+            self.root,
+            text="Suggestions",
+            bg="#0f1117",
+            fg="#ff5577",
+            font=("Courier", 12, "bold")
+        ).place(x=20, y=620)
+
+        # ── Suggestion buttons ───────────────────────────────────────────────
+        btn_style = {
+            "font": ("Courier", 12),
+            "bg": "#1a1d27",
+            "fg": "#00e5ff",
+            "activebackground": "#222233",
+            "activeforeground": "white",
+            "relief": "flat",
+            "bd": 0
+        }
+
+        self.b1 = tk.Button(self.root, **btn_style)
+        self.b2 = tk.Button(self.root, **btn_style)
+        self.b3 = tk.Button(self.root, **btn_style)
+        self.b4 = tk.Button(self.root, **btn_style)
+
+        self.b1.place(x=20, y=650, width=200, height=40)
+        self.b2.place(x=240, y=650, width=200, height=40)
+        self.b3.place(x=460, y=650, width=200, height=40)
+        self.b4.place(x=680, y=650, width=200, height=40)
+
+        # ── Speak button ─────────────────────────────────────────────────────
+        tk.Button(
+            self.root,
+            text="▶ Speak",
+            command=self.speak_fun,
+            bg="#00e5ff",
+            fg="#0f1117",
+            activebackground="#00bcd4",
+            relief="flat",
+            font=("Courier", 13, "bold")
+        ).place(x=970, y=620, width=120, height=40)
+
+        # ── Clear button ─────────────────────────────────────────────────────
+        tk.Button(
+            self.root,
+            text="⌫ Clear",
+            command=self.clear_fun,
+            bg="#ff4466",
+            fg="white",
+            activebackground="#dd3355",
+            relief="flat",
+            font=("Courier", 13, "bold")
+        ).place(x=1110, y=620, width=120, height=40)
+
+        # ── Select image ─────────────────────────────────────────────────────
+        tk.Label(
+            self.root,
+            text="Select Gesture",
+            bg="#0f1117",
+            fg="#666677",
+            font=("Courier", 11, "bold")
+        ).place(x=970, y=20)
+
+        self.image_panel1 = tk.Label(
+            self.root,
+            bg="#1a1d27",
+            bd=0
+        )
+        self.image_panel1.place(x=970, y=50, width=240, height=240)
+
+        img1 = Image.open("select.png").resize((240, 240), Image.LANCZOS)
         self.photo1 = ImageTk.PhotoImage(img1)
         self.image_panel1.configure(image=self.photo1)
-        self.image_panel1.image= self.photo1
+        self.image_panel1.image = self.photo1
 
-        tk.Label(self.root, text="Backspace:",
-                 font=("Courier", 20, "bold")).place(x=900, y=300)
-        self.panel6 = tk.Label(self.root, font=("Courier", 20))
-        self.panel6.place(x=900, y=300)
+        # ── Backspace image ──────────────────────────────────────────────────
+        tk.Label(
+            self.root,
+            text="Backspace Gesture",
+            bg="#0f1117",
+            fg="#666677",
+            font=("Courier", 11, "bold")
+        ).place(x=970, y=320)
 
-        self.image_panel2 = tk.Label(self.root, bg="white", relief="flat")
-        self.image_panel2.place(x=900, y=350, width=270, height=270)
-        img2 = Image.open("thumbs up.png").resize((270, 270), Image.LANCZOS)
+        self.image_panel2 = tk.Label(
+            self.root,
+            bg="#1a1d27",
+            bd=0
+        )
+        self.image_panel2.place(x=970, y=350, width=240, height=240)
+
+        img2 = Image.open("thumbs up.png").resize((240, 240), Image.LANCZOS)
         self.photo2 = ImageTk.PhotoImage(img2)
         self.image_panel2.configure(image=self.photo2)
         self.image_panel2.image = self.photo2
 
-        # sentence
-        tk.Label(self.root, text="Sentence :",
-                 font=("Courier", 20, "bold")).place(x=20, y=620)
-        self.panel5 = tk.Label(self.root, font=("Courier", 18),
-                                wraplength=900, anchor="w", justify="left")
-        self.panel5.place(x=180, y=622)
+        # ── Status bar ───────────────────────────────────────────────────────
+        self.status = tk.Label(
+            self.root,
+            text="ONNX Model Loaded",
+            bg="#0a0c12",
+            fg="#445566",
+            anchor="w",
+            font=("Courier", 9)
+        )
 
-        # suggestions label
-        tk.Label(self.root, text="Suggestions :", fg="red",
-                 font=("Courier", 16, "bold")).place(x=20, y=665)
-
-        # suggestion buttons
-        self.b1 = tk.Button(self.root, font=("Courier", 13), wraplength=150)
-        self.b2 = tk.Button(self.root, font=("Courier", 13), wraplength=150)
-        self.b3 = tk.Button(self.root, font=("Courier", 13), wraplength=150)
-        self.b4 = tk.Button(self.root, font=("Courier", 13), wraplength=150)
-        self.b1.place(x=200, y=660, width=160, height=35)
-        self.b2.place(x=370, y=660, width=160, height=35)
-        self.b3.place(x=540, y=660, width=160, height=35)
-        self.b4.place(x=710, y=660, width=160, height=35)
-
-        # speak / clear buttons
-        tk.Button(self.root, text="Speak", font=("Courier", 14),
-                  command=self.speak_fun).place(x=900, y=620, width=90, height=35)
-        tk.Button(self.root, text="Clear", font=("Courier", 14),
-                  command=self.clear_fun).place(x=1000, y=620, width=90, height=35)
-
+        self.status.place(x=0, y=700, width=1250, height=20)
         # ── App state ─────────────────────────────────────────────────────────
         self.str    = " "
         self.ccc    = 0
