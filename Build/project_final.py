@@ -63,9 +63,9 @@ class Application:
 
         print("Loaded model from disk")
 
-        # ── MODERN GUI ───────────────────────────────────────────────────────
+        # ── GUI ───────────────────────────────────────────────────────
         self.root = tk.Tk()
-        self.root.title("ASL Sign Reader")
+        self.root.title(" Sign Language Reader")
         self.root.geometry("1250x720")
         self.root.configure(bg="#0f1117")
         self.root.resizable(False, False)
@@ -103,7 +103,7 @@ class Application:
             text="",
             bg="#0f1117",
             fg="#00ff88",
-            font=("Courier", 48, "bold")
+            font=("Courier", 30, "bold")
         )
         self.panel3.place(x=20, y=500)
 
