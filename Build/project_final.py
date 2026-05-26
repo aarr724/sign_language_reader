@@ -83,7 +83,7 @@ class Application:
         # ── Title ────────────────────────────────────────────────────────────
         tk.Label(
             self.root,
-            text="ASL Sign Language Reader",
+            text="Sign Language Reader",
             bg="#0f1117",
             fg="#00e5ff",
             font=("Courier", 24, "bold")
@@ -164,7 +164,7 @@ class Application:
         # ── Speak button ─────────────────────────────────────────────────────
         tk.Button(
             self.root,
-            text="▶ Speak",
+            text=" Speak",
             command=self.speak_fun,
             bg="#00e5ff",
             fg="#0f1117",
@@ -226,6 +226,14 @@ class Application:
         self.photo2 = ImageTk.PhotoImage(img2)
         self.image_panel2.configure(image=self.photo2)
         self.image_panel2.image = self.photo2
+
+        #button for hint window
+        self.new_window_btn = tk.Button(self.root, text="Sign Language Hint",
+                                        font=("Courier", 14),bg="#ff4466",
+                                        fg="white",
+                                        activebackground="#dd3355",
+                                        command=self.open_new_window)
+        self.new_window_btn.place(x=570, y=430, width=250, height=35)
 
         # ── Status bar ───────────────────────────────────────────────────────
         self.status = tk.Label(
@@ -664,6 +672,17 @@ class Application:
         self.root.destroy()
         self.vs.release()
         cv2.destroyAllWindows()
+
+    def open_new_window(self):
+        new_win = tk.Toplevel(self.root)
+        new_win.title("Sign Language")
+        new_win.geometry("1000x800")
+        img = Image.open("sign.jpg").resize((800, 600), Image.LANCZOS)
+        self._new_win_photo = ImageTk.PhotoImage(img)
+
+        img_label = tk.Label(new_win, image=self._new_win_photo)
+        img_label.image = self._new_win_photo
+        img_label.place(x=10, y=10, width=800, height=600)
 
 
 
