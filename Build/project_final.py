@@ -17,14 +17,14 @@ import cv2
 import sys
 import traceback
 import pyttsx3
-import onnxruntime as ort                    # replaces tensorflow
+import onnxruntime as ort
 from cvzone.HandTrackingModule import HandDetector
 from string import ascii_uppercase
 import enchant
 import tkinter as tk
 from PIL import Image, ImageTk
 
-# ── Global setup ──────────────────────────────────────────────────────────────
+
 ddd = enchant.Dict("en-US")
 hd  = HandDetector(maxHands=1)
 hd2 = HandDetector(maxHands=1)
@@ -38,17 +38,17 @@ class Application:
         self.vs = cv2.VideoCapture(0)
         self.current_image = None
 
-        # ── Load ONNX model ───────────────────────────────────────────────────
+
         self.model      = ort.InferenceSession('cnn8grps_rad1_model.onnx')
         self.input_name = self.model.get_inputs()[0].name
 
-        # ── Text-to-speech ────────────────────────────────────────────────────
+        # ── Text-to-speech
         self.speak_engine = pyttsx3.init()
         self.speak_engine.setProperty("rate", 100)
         voices = self.speak_engine.getProperty("voices")
         self.speak_engine.setProperty("voice", voices[0].id)
 
-        # ── State ─────────────────────────────────────────────────────────────
+
         self.ct             = {'blank': 0}
         self.blank_flag     = 0
         self.space_flag     = False
@@ -63,7 +63,7 @@ class Application:
 
         print("Loaded model from disk")
 
-        # ── GUI ───────────────────────────────────────────────────────
+        # ── GUI
         self.root = tk.Tk()
         self.root.title(" Sign Language Reader")
         self.root.geometry("1250x720")
@@ -72,15 +72,15 @@ class Application:
 
         self.root.protocol('WM_DELETE_WINDOW', self.destructor)
 
-        # ── Camera feed ──────────────────────────────────────────────────────
+
         self.panel = tk.Label(self.root, bg="#1a1d27", bd=0)
         self.panel.place(x=20, y=20, width=520, height=390)
 
-        # ── Skeleton feed ────────────────────────────────────────────────────
+
         self.panel2 = tk.Label(self.root, bg="#1a1d27", bd=0)
         self.panel2.place(x=570, y=20, width=350, height=350)
 
-        # ── Title ────────────────────────────────────────────────────────────
+
         tk.Label(
             self.root,
             text="Sign Language Reader",
@@ -89,7 +89,7 @@ class Application:
             font=("Courier", 24, "bold")
         ).place(x=20, y=430)
 
-        # ── Character display ────────────────────────────────────────────────
+
         tk.Label(
             self.root,
             text="Current Character",
@@ -107,7 +107,7 @@ class Application:
         )
         self.panel3.place(x=20, y=500)
 
-        # ── Sentence box ─────────────────────────────────────────────────────
+
         tk.Label(
             self.root,
             text="Sentence",
@@ -131,7 +131,7 @@ class Application:
 
         self.panel5.place(x=250, y=510, width=700, height=90)
 
-        # ── Suggestions title ────────────────────────────────────────────────
+
         tk.Label(
             self.root,
             text="Suggestions",
@@ -140,7 +140,7 @@ class Application:
             font=("Courier", 12, "bold")
         ).place(x=20, y=620)
 
-        # ── Suggestion buttons ───────────────────────────────────────────────
+
         btn_style = {
             "font": ("Courier", 12),
             "bg": "#1a1d27",
@@ -161,7 +161,7 @@ class Application:
         self.b3.place(x=460, y=650, width=200, height=40)
         self.b4.place(x=680, y=650, width=200, height=40)
 
-        # ── Speak button ─────────────────────────────────────────────────────
+
         tk.Button(
             self.root,
             text=" Speak",
@@ -173,7 +173,7 @@ class Application:
             font=("Courier", 13, "bold")
         ).place(x=970, y=620, width=120, height=40)
 
-        # ── Clear button ─────────────────────────────────────────────────────
+
         tk.Button(
             self.root,
             text="⌫ Clear",
@@ -185,7 +185,7 @@ class Application:
             font=("Courier", 13, "bold")
         ).place(x=1110, y=620, width=120, height=40)
 
-        # ── Select image ─────────────────────────────────────────────────────
+
         tk.Label(
             self.root,
             text="Select Gesture",
@@ -206,7 +206,7 @@ class Application:
         self.image_panel1.configure(image=self.photo1)
         self.image_panel1.image = self.photo1
 
-        # ── Backspace image ──────────────────────────────────────────────────
+
         tk.Label(
             self.root,
             text="Backspace Gesture",
@@ -227,7 +227,7 @@ class Application:
         self.image_panel2.configure(image=self.photo2)
         self.image_panel2.image = self.photo2
 
-        #button for hint window
+
         self.new_window_btn = tk.Button(self.root, text="Sign Language Hint",
                                         font=("Courier", 14),bg="#ff4466",
                                         fg="white",
@@ -235,7 +235,7 @@ class Application:
                                         command=self.open_new_window)
         self.new_window_btn.place(x=570, y=430, width=250, height=35)
 
-        # ── Status bar ───────────────────────────────────────────────────────
+
         self.status = tk.Label(
             self.root,
             text="ONNX Model Loaded",
@@ -246,7 +246,7 @@ class Application:
         )
 
         self.status.place(x=0, y=700, width=1250, height=20)
-        # ── App state ─────────────────────────────────────────────────────────
+
         self.str    = " "
         self.ccc    = 0
         self.word   = " "
@@ -255,7 +255,7 @@ class Application:
 
         self.video_loop()
 
-    # ── Main video loop ───────────────────────────────────────────────────────
+    # ── Main video loop
     def video_loop(self):
         try:
             ok, frame = self.vs.read()
@@ -323,7 +323,7 @@ class Application:
         finally:
             self.root.after(1, self.video_loop)
 
-    # ── Skeleton drawing ──────────────────────────────────────────────────────
+
     def _draw_skeleton(self, canvas, os_x, os_y):
         p = self.pts
 
@@ -347,7 +347,7 @@ class Application:
         for i in range(21):
             cv2.circle(canvas, pt(i), 2, (0, 0, 255), 1)
 
-    # ── Suggestion buttons ────────────────────────────────────────────────────
+
     def _update_suggestion_buttons(self):
         pairs = [
             (self.b1, self.word1, self.action1),
@@ -358,7 +358,7 @@ class Application:
         for btn, word, cmd in pairs:
             btn.config(text=word, command=cmd)
 
-    # ── Helpers ───────────────────────────────────────────────────────────────
+
     def distance(self, x, y):
         return math.sqrt((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2)
 
@@ -379,7 +379,7 @@ class Application:
         self.str = " "
         self.word1 = self.word2 = self.word3 = self.word4 = " "
 
-    # ── Prediction (ONNX) ─────────────────────────────────────────────────────
+    # ── Prediction (ONNX)
     def predict(self, test_image):
         # prepare input — float32, shape (1, 400, 400, 3)
         inp  = test_image.reshape(1, 400, 400, 3).astype(np.float32)
@@ -395,7 +395,7 @@ class Application:
         pl = [ch1, ch2]
         p  = self.pts
 
-        # ── group-level disambiguation ────────────────────────────────────────
+
         l = [[5,2],[5,3],[3,5],[3,6],[3,0],[3,2],[6,4],[6,1],[6,2],[6,6],[6,7],
              [6,0],[6,5],[4,1],[1,0],[1,1],[6,3],[1,6],[5,6],[5,1],[4,5],[1,4],
              [1,5],[2,0],[2,6],[4,6],[1,0],[5,7],[1,6],[6,1],[7,6],[2,5],[7,1],
@@ -561,7 +561,7 @@ class Application:
             if p[6][1]>p[8][1] and p[10][1]>p[12][1] and p[14][1]>p[16][1]:
                 ch1 = 1
 
-        # ── map group indices → letters ───────────────────────────────────────
+
         if ch1 == 0:
             ch1 = 'S'
             if p[4][0]<p[6][0] and p[4][0]<p[10][0] and p[4][0]<p[14][0] and p[4][0]<p[18][0]:
@@ -631,7 +631,7 @@ class Application:
                     p[4][1]<p[6][1] and p[4][1]<p[10][1] and p[4][1]<p[14][1] and p[4][1]<p[18][1]):
                 ch1 = 'Backspace'
 
-        # ── commit on "next" ──────────────────────────────────────────────────
+
         if ch1 == "next" and self.prev_char != "next":
             prev2 = self.ten_prev_char[(self.count - 2) % 10]
             prev0 = self.ten_prev_char[(self.count - 0) % 10]
@@ -652,7 +652,7 @@ class Application:
         self.count += 1
         self.ten_prev_char[self.count % 10] = ch1
 
-        # ── word suggestions ──────────────────────────────────────────────────
+
         if self.str.strip():
             st   = self.str.rfind(" ")
             word = self.str[st + 1:]
@@ -666,7 +666,7 @@ class Application:
             else:
                 self.word1 = self.word2 = self.word3 = self.word4 = " "
 
-    # ── Cleanup ───────────────────────────────────────────────────────────────
+    # ── Cleanup
     def destructor(self):
         print(self.ten_prev_char)
         self.root.destroy()
